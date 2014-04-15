@@ -6,11 +6,11 @@ Setting up a basic "Hello World" app on Heroku with staging and production envir
 
 To get our initial setup created we're going to use Virtualenv and Virtualenvwrapper to help set things up. This will give us a few extra tools to help us silo our environment. I'm going to assume for this tutorial you've used a few things before, I've included links to where you can find our more information about each if you havn't.
 
-Virtualenv - http://www.virtualenv.org/en/latest/
+Virtualenv - http://www.virtualenv.org/en/latest/ <br>
 Virtualenvwrapper - http://virtualenvwrapper.readthedocs.org/en/latest/
-Flask - http://flask.pocoo.org/
-git/github - http://try.github.io/levels/1/challenges/1
-Heroku (basic) - http://www.realpython.com/blog/python/migrating-your-django-project-to-heroku/
+Flask - http://flask.pocoo.org/ <br>
+git/github - http://try.github.io/levels/1/challenges/1 <br>
+Heroku (basic) - http://www.realpython.com/blog/python/migrating-your-django-project-to-heroku/ <br>
 
 
 Getting things set up:
@@ -89,11 +89,11 @@ After you have Heroku setup on your machine create a Procfile
 ```
 $ touch Procfile
 ```
-and add the line
+and add the following line to your newly created file
 ```python
 web: gunicorn app:app
 ```
-to your newly created file. Make sure to add gunicorn to your requirments.txt file
+Make sure to add gunicorn to your requirments.txt file
 ```
 $ pip install gunicorn
 $ pip freeze > requirements.txt
