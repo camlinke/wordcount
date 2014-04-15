@@ -6,11 +6,11 @@ Setting up a basic "Hello World" app on Heroku with staging and production envir
 
 To get our initial setup created we're going to use Virtualenv and Virtualenvwrapper to help set things up. This will give us a few extra tools to help us silo our environment. I'm going to assume for this tutorial you've used a few things before, I've included links to where you can find our more information about each if you havn't.
 
-Virtualenv - if not check this out.
-Virtualenvwrapper - if not check this out.
-Flask - If not check this tutorial out.
-git/github - If not check out this tutorial.
-Heroku (basic) - If not check out this tutorial.
+Virtualenv - http://www.virtualenv.org/en/latest/
+Virtualenvwrapper - http://virtualenvwrapper.readthedocs.org/en/latest/
+Flask - http://flask.pocoo.org/
+git/github - http://try.github.io/levels/1/challenges/1
+Heroku (basic) - http://www.realpython.com/blog/python/migrating-your-django-project-to-heroku/
 
 
 Getting things set up:
@@ -83,7 +83,7 @@ and you should see your basic Hello world app in action.
 Next we're going to set up our Heroku environments for both our production and staging app.
 
 Setup Heroku
-See http://www.realpython.com/blog/python/migrating-your-django-project-to-heroku/ for more basic information about setting up your heroku app for use iwth Python. There is some Django specific stuff in there, however most of it applies to any python setup.
+I'm going to assume you have the heroku toolchain installed. For more basic information about setting up your heroku app for use with Python see the earlier link - There is some Django specific stuff in there, however most of it applies to any python setup.
 
 After you have Heroku setup on your machine create a Procfile
 ```
@@ -124,8 +124,37 @@ For production
 ```
 $ git push production master
 ```
-Once both of those have been pushed you can navigate to them and see that your app is working on both URLs. 
+Once both of those have been pushed you can navigate to them and see that your app is working on both URLs. Let's make a change to our app and push only to stage. Change your app to:
+```python
+from flask import Flask
+app = Flask(__name__)
 
+@app.route('/')
+def hello():
+    return "Hello World!"
+
+@app.route('/<name>')
+def hello_name(name):
+    return "Hello {}!".format(name)
+
+if __name__ == '__main__':
+    app.run()
+```
+
+Run your app locally to make sure everything is working
+```
+$ python app.py
+```
+Now we want to try out our changes on stage before we push them live to production. Make sure your changes are comitted in git and push your work up to stage
+```
+$ git push stage master
+```
+
+Now if you navigate to your stage environment you'll be able to use the new /<name> url and get "Hello <name>" based on what you put into the URL. However if you try the same thing on the production site you will get an error. So we can build things and test them out on stage and then when we're happy push them live. Let's push our site to production now that we're happy with it
+```
+$ git push production master
+```
+Now we have our funcationality live on our production site. This stage/production system allows us to make changes, show things to clients, use a sandboxed payment server, etc. without causing any changes to the live production site that users are using.
 
 
 
