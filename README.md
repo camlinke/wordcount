@@ -4,13 +4,14 @@ The app that’s being built is going to be a simple text box that you enter in 
 
 Setting up a basic "Hello World" app on Heroku with staging and production environments.
 
-To get our initial setup created we're going to use Virtualenv and Virtualenvwrapper to help set things up. This will give us a few extra tools to help us silo our environment. I'm going to assume for this tutorial you've used a few things before:
+To get our initial setup created we're going to use Virtualenv and Virtualenvwrapper to help set things up. This will give us a few extra tools to help us silo our environment. I'm going to assume for this tutorial you've used a few things before, I've included links to where you can find our more information about each if you havn't.
 
 Virtualenv - if not check this out.
 Virtualenvwrapper - if not check this out.
 Flask - If not check this tutorial out.
 git/github - If not check out this tutorial.
 Heroku (basic) - If not check out this tutorial.
+
 
 Getting things set up:
 First things first lets get a repo set up. Create a repo in Github (if you want) and clone it into your working directory. Alternatively init a new github repo. Next we're going to use Virtualenvwrapper to set up a new virtual environment by running the following command:
@@ -79,9 +80,51 @@ $ python app.py
 ```
 and you should see your basic Hello world app in action.
 
-Next we're going to set up our Heroku environments for both our production and 
+Next we're going to set up our Heroku environments for both our production and staging app.
 
+Setup Heroku
+See http://www.realpython.com/blog/python/migrating-your-django-project-to-heroku/ for more basic information about setting up your heroku app for use iwth Python. There is some Django specific stuff in there, however most of it applies to any python setup.
 
+After you have Heroku setup on your machine create a Procfile
+```
+$ touch Procfile
+```
+and add the line
+```python
+web: gunicorn app:app
+```
+to your newly created file. Make sure to add gunicorn to your requirments.txt file
+```
+$ pip install gunicorn
+$ pip freeze > requirements.txt
+```
+Commit your changes in git and head to Heroku to create two new apps. You can do this from the command line if you choose, I find it really easy to set up in the Heroku dashboard however. Click create new app and create the production version for your app. I've named my app wordcount3000. Head back to your command line and add the following line, where YOUR_APP is the name of your app.
+```
+remote add production git@heroku.com:YOUR_APP.git
+```
+in my case this is:
+```
+remote add production git@heroku.com:wordcount3000.git
+```
+
+In a simliar manner we're going to follow the same process to create a staging server. Create a new Heroku app and name it stage-YOUr_APP, in my case this is stage-wordcount3000. Back on the command line set up that repo with stage instead of production:
+```
+$ git remote add stage git@heroku.com:stage-YOUR_APP.git
+```
+for me this is:
+```
+$ git remote add stage git@heroku.com:stage-wordcount3000.git
+```
+Now we can push both of our apps live to Heroku.
+For stage:
+```
+$ git push stage master
+```
+For production
+```
+$ git push production master
+```
+Once both of those have been pushed you can navigate to them and see that your app is working on both URLs. 
 
 
 
