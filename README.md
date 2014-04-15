@@ -7,7 +7,7 @@ Setting up a basic "Hello World" app on Heroku with staging and production envir
 To get our initial setup created we're going to use Virtualenv and Virtualenvwrapper to help set things up. This will give us a few extra tools to help us silo our environment. I'm going to assume for this tutorial you've used a few things before, I've included links to where you can find our more information about each if you havn't.
 
 Virtualenv - http://www.virtualenv.org/en/latest/ <br>
-Virtualenvwrapper - http://virtualenvwrapper.readthedocs.org/en/latest/
+Virtualenvwrapper - http://virtualenvwrapper.readthedocs.org/en/latest/ <br>
 Flask - http://flask.pocoo.org/ <br>
 git/github - http://try.github.io/levels/1/challenges/1 <br>
 Heroku (basic) - http://www.realpython.com/blog/python/migrating-your-django-project-to-heroku/ <br>
@@ -156,8 +156,81 @@ $ git push production master
 ```
 Now we have our funcationality live on our production site. This stage/production system allows us to make changes, show things to clients, use a sandboxed payment server, etc. without causing any changes to the live production site that users are using.
 
+The last thing that we're going to do is set up our different config environments for our app as well as stage and production databases. Often there are things that are going to be different between your local, stage, and production setups. You’ll want to connect to different databases, have different AWS keys, etc. Let’s set up a config file to deal with the different servers. Add a config.py file to your project
+```
+$ touch config.py
+```
+With our config file we're going to borrow a bit from how Django's config is set up. We'll have a base config class that the other config classes can inherit from. Then we'll import the appropriate config class as needed. Add the following to your newly created config.py file:
+```python
+class Config(object):
+    DEBUG = False
+    TESTING = False
+    CSRF_ENABLED = True
+    SECRET_KEY = 'this-really-needs-to-be-changed'
+
+class ProductionConfig(Config):
+    DEBUG = False
+
+class StagingConfig(Config):
+    DEVELOPMENT = True
+    DEBUG = True
+
+class DevelopmentConfig(Config):
+    DEVELOPMENT = True
+    DEBUG = True
+
+class TestingConfig(Config):
+    TESTING = True
+```
+We set up a base Config class with some basic setup that our other config classes inherit from. Now we will be able to import the appopriate config class based on the situation that we're in.
+<br>
+<br>
+Now we’re going to use environment variables to choose which settings we’re going to use. We import os and add add a line to use the config based on an environment variable called "APP_SETTINGS"
+<br>
+Locally: <br>
+To set up our APP_SETTINGS variable locally we are going to use our Virtualenvwrapper postactivate file again to set the APP_SETTINGS variable. <br>
+Add the following line to your postactivate file 
+```
+export APP_SETTINGS="config.DevelopmentConfig"
+```
+Reload your environment by running the workon wordcount command again.
+```
+$ workon wordcount
+```
+Now when you run your app it will import from the configuration that you set up in your DevelopmentConfig class.
+<br>
+On Heroku: <br>
+Similarly we’re going to set environment variables on Heroku. For staging run the following comand:
+```
+$ heroku config:set APP_SETTINGS=config.StagingConfig --remote stage
+```
+
+For production:
+```
+$ heroku config:set APP_SETTINGS=config.StagingConfig --remote production
+```
+To make sure we use the right environment change your app.py file to be:
+```python
+from flask import Flask
+import os
+
+app = Flask(__name__)
+app.config.from_object(os.environ['APP_SETTINGS'])
 
 
+@app.route('/')
+def hello():
+    return "Hello World!"
+
+@app.route('/<name>')
+def hello_name(name):
+    return "Hello {}!".format(name)
+
+if __name__ == '__main__':
+    app.run()
+```
+We imported os and we use the os.environ method to get the APP_SETTINGS variables that we set up in both staging and production. we then set up the config in our app with the app.config.from_object method. <br>
+Commit and push your changes to both stage and production. Now we will be pulling each config settings for each environment that we are in.
 
 
 
