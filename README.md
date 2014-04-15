@@ -39,26 +39,32 @@ $ touch app.py .gitignore README.md requirements.txt
 
 This will give you the following structure (note, the readme and gitignore files should have been created already if you cloned a github project that you set up.):
 
+```
 Wordcount
     app.py
     .gitignore
     README.md
     requirements.txt
+```
 
 Next we'll install flask:
 
+```
 $ pip install flask
+```
 
 and add the installed libraries to our requirements.txt file
 
+```
 $ pip freeze > requirements.txt
+```
 
 Open up app.py in your favorite editor and add the following code:
 
+```python
 from flask import Flask
 app = Flask(__name__)
 
-```python
 @app.route('/')
 def hello():
     return "Hello World!"
