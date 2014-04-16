@@ -229,9 +229,11 @@ def hello_name(name):
 if __name__ == '__main__':
     app.run()
 ```
-We imported os and we use the os.environ method to get the APP_SETTINGS variables that we set up in both staging and production. we then set up the config in our app with the app.config.from_object method. <br>
+We imported os and we use the os.environ method to get the APP_SETTINGS variables that we set up in both staging and production. We then set up the config in our app with the app.config.from_object method. <br>
 Commit and push your changes to both stage and production. Now we will be pulling each config settings for each environment that we are in.
-
+<br>
+<br>
+In the next part we're going to start to build out the word counting functionality of this app. Along the way we will add a request queue to set up background processing for the word count portion, as well we'll dig further into our heroku setup by adding setting up the configuration and migrations for our database which we'll use to store our wordcount results.
 
 
 
