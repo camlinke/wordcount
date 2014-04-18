@@ -1,8 +1,9 @@
-Setting up a Staging and Production for Flask on Heroku
+#Setting up a Staging and Production for Flask on Heroku
+
 
 The app that’s being built is going to be a simple text box that you enter in a webpage and it processes and displays a count of how many times each word appears on the page (or twitter stream). In part one we'll set up a local development environment and then deploy both a staging environment and a production environment on Heroku. In part 2 we'll be doing a bunch of backend processing to count the words of a web page so we’ll implement a request queue that will do the actual processing of the words.
 
-Setting up a basic "Hello World" app on Heroku with staging and production environments.
+## Part 1: Setting up a basic "Hello World" app on Heroku with staging and production environments.
 
 To get our initial setup created we're going to use Virtualenv and Virtualenvwrapper to help set things up. This will give us a few extra tools to help us silo our environment. I'm going to assume for this tutorial you've used a few things before, I've included links to where you can find our more information about each if you havn't.
 
@@ -235,7 +236,7 @@ Commit and push your changes to both stage and production. Now we will be pullin
 <br>
 In the next part we're going to start to build out the word counting functionality of this app. Along the way we will add a request queue to set up background processing for the word count portion, as well we'll dig further into our heroku setup by adding setting up the configuration and migrations for our database which we'll use to store our wordcount results.
 
-#Part 2
+##Part 2
 
 
 
