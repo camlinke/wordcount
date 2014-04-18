@@ -235,6 +235,8 @@ Commit and push your changes to both stage and production. Now we will be pullin
 <br>
 In the next part we're going to start to build out the word counting functionality of this app. Along the way we will add a request queue to set up background processing for the word count portion, as well we'll dig further into our heroku setup by adding setting up the configuration and migrations for our database which we'll use to store our wordcount results.
 
+#Part 2
+
 
 
 
