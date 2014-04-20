@@ -1,6 +1,6 @@
 # Build and Deploy a Flask App in Thirty Minutes: Part 1 (Setup)
 
-Welcome! Today we're going to build an app with simple text box that you enter in a webpage and it processes and displays a count of how many times each word appears on the page (or twitter stream). In part one, we'll set up a local development environment and then deploy both a staging environment and a production environment on Heroku. In part two, we'll be doing a bunch of backend processing to count the words of a web page so we’ll implement a request queue that will do the actual processing of the words.
+Welcome! Today we're going to build an app with a simple text box that you enter in a webpage and it processes and displays a count of how many times each word appears on the page (or twitter stream). In part one, we'll set up a local development environment and then deploy both a staging environment and a production environment on Heroku. In part two, we'll be doing a bunch of backend processing to count the words of a web page so we’ll implement a request queue that will do the actual processing of the words.
 
 ## Setup
 
@@ -20,13 +20,13 @@ First things first, let's get a repo set up. Create a repo in Github (if you wan
 $ git init
 ```
 
-Next we're going to use Virtualenvwrapper to set up a new virtual environment by running the following command:
+Next, we're going to use Virtualenvwrapper to set up a new virtual environment by running the following command:
 
 ```
 $ mkvirtualenv wordcount
 ```
 
-This creates a new virtualenv for us. Along with creating a new virtualenv, it create some new options including *Postactivate* - which happens after you run the `workon` command to start your virtual environment. This is going to help us later when we are setting up some environment variables - but for now we're also going to use it to automatically jump to our project when we first start it.
+This creates a new virtualenv for us. Along with creating a new virtualenv, it creates some new options including *Postactivate* - which happens after you run the `workon` command to start your virtual environment. This is going to help us later when we are setting up some environment variables - but for now we're also going to use it to automatically jump to our project when we first start it.
 
 Open up the *postactivate* file. The easiest way to do this is with VIM: 
 
@@ -195,7 +195,7 @@ Now we want to try out our changes on staging before we push them live to produc
 $ git push stage master
 ```
 
-Now if you navigate to your staging environment, you'll be able to use the new `/<name>` url and get "Hello <name>" based on what you put into the URL as the output. However if you try the same thing on the production site you will get an error. *So we can build things and test them out on staging and then when we're happy, push them live to production.* 
+Now if you navigate to your staging environment, you'll be able to use the new `/<name>` url and get "Hello <name>" based on what you put into the URL as the output. However, if you try the same thing on the production site you will get an error. *So we can build things and test them out on staging and then when we're happy, push them live to production.* 
 
 Let's push our site to production now that we're happy with it:
 
@@ -338,6 +338,6 @@ config.StagingConfig
 
 <hr>
 
-With the setup out of the way, in the next part we're going to start to build out the word counting functionality of this app. Along the way, we'll add a request queue to set up background processing for the word count portion, as well dig further into our Heroku setup by adding setting up the configuration and migrations for our database which we'll use to store our wordcount results.
+With the setup out of the way, we're going to start to build out the word counting functionality of this app in the next part. Along the way, we'll add a request queue to set up background processing for the word count portion, as well dig further into our Heroku setup by adding setting up the configuration and migrations for our database which we'll use to store our wordcount results.
 
 Best!
