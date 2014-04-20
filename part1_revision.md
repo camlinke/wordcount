@@ -1,4 +1,4 @@
-# Build and Deploy a Flask App in Thirty Minutes: Part 1 (Setup)
+# Flask by Example - Part 1: Project Setup
 
 Welcome! Today we're going to build an app with a simple text box that you enter in a webpage and it processes and displays a count of how many times each word appears on the page (or twitter stream). In part one, we'll set up a local development environment and then deploy both a staging environment and a production environment on Heroku. In part two, we'll be doing a bunch of backend processing to count the words of a web page so we’ll implement a request queue that will do the actual processing of the words.
 
