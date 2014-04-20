@@ -1,10 +1,13 @@
 # Flask by Example - Part 1: Project Setup
 
-Welcome! Today we're going to build an app with a simple text box that you enter in a webpage and it processes and displays a count of how many times each word appears on the page (or twitter stream). In part one, we'll set up a local development environment and then deploy both a staging environment and a production environment on Heroku. In part two, we'll be doing a bunch of backend processing to count the words of a web page so we’ll implement a request queue that will do the actual processing of the words.
+Welcome! Today we're going to build an app using Flask with a simple text box that you enter text into and the app processes and displays a count of how many times each word appears on the page. 
+
+1. In part one, we'll set up a local development environment and then deploy both a staging environment and a production environment on Heroku. 
+2. In part two, we'll be doing a bunch of backend processing to count the words of a web page so we’ll implement a request queue that will do the actual processing of the words.
 
 ## Setup
 
-We'll start with a *basic "Hello World" app on Heroku with staging and production environments*.
+We'll start with a *basic "Hello World" app on Heroku with staging (or pre-production) and production environments*.
 
 To get our initial setup created we're going to use Virtualenv and Virtualenvwrapper. This will give us a few extra tools to help us silo our environment. I'm going to assume for this tutorial you've used the following tools before: 
 
@@ -14,7 +17,7 @@ To get our initial setup created we're going to use Virtualenv and Virtualenvwra
 - git/Github - [http://try.github.io/levels/1/challenges/1](http://try.github.io/levels/1/challenges/1)
 - Heroku (basics) - [https://devcenter.heroku.com/articles/getting-started-with-python](https://devcenter.heroku.com/articles/getting-started-with-python) 
 
-First things first, let's get a repo set up. Create a repo in Github (if you want) and clone it into your working directory. Alternatively initialize a new git repo within your working directory:
+First things first, let's get a repo set up. Create a repo in Github (if you want) and clone it into your working directory. Alternatively, initialize a new git repo within your working directory:
 
 ```
 $ git init
@@ -26,7 +29,7 @@ Next, we're going to use Virtualenvwrapper to set up a new virtual environment b
 $ mkvirtualenv wordcount
 ```
 
-This creates a new virtualenv for us. Along with creating a new virtualenv, it creates some new options including *Postactivate* - which happens after you run the `workon` command to start your virtual environment. This is going to help us later when we are setting up some environment variables - but for now we're also going to use it to automatically jump to our project when we first start it.
+This creates a new virtualenv for us. Along with creating a new virtualenv, it creates some new options, including *[Postactivate](http://virtualenvwrapper.readthedocs.org/en/latest/scripts.html#scripts-postactivate)*, after you run the `workon` command to start your virtual environment. This is going to help us later when we are setting up some environment variables - but for now we're also going to use it to automatically jump to our project when we first start it.
 
 Open up the *postactivate* file. The easiest way to do this is with VIM: 
 
@@ -50,9 +53,9 @@ Now open a new terminal window and run the following command:
 $ workon wordcount
 ```
 
-If all is setup properly, it will activate your environment and move you directly to the project directory. A nice timesaver. :)
+If all is setup properly, it will activate your environment and move you directly to the project directory. A nice timesaver. :) *If you are having problems with virtualenvwrapper, just use virtualenv.*
 
-Next we're going to get our basic structure for our app set up. Add the following files to your wordcount folder:
+Next we're going to get our basic structure for our app set up. Add the following files to your "wordcount" folder:
 
 ```
 $ touch app.py .gitignore README.md requirements.txt
@@ -81,7 +84,7 @@ Add the installed libraries to our *requirements.txt* file:
 $ pip freeze > requirements.txt
 ```
 
-Open up app.py in your favorite editor and add the following code to *app.py*:
+Open up *app.py* in your favorite editor and add the following code:
 
 ```python
 from flask import Flask
@@ -107,7 +110,7 @@ Next we're going to set up our Heroku environments for both our production and s
 
 ## Setup Heroku
 
-I'm going to assume you have the Heroku toolchain installed. For more basic information about setting up your Heroku app for use with Python see the earlier link.
+I'm going to assume you have the Heroku [Toolbelt](https://toolbelt.heroku.com/) installed. For more basic information about setting up your Heroku app for use with Python see the earlier link.
 
 After you have Heroku setup on your machine create a Procfile:
 
@@ -121,7 +124,7 @@ Add the following line to your newly created file
 web: gunicorn app:app
 ```
 
-Make sure to add gunicorn to your requirments.txt file
+Make sure to add gunicorn to your *requirments.txt* file
 
 ```
 $ pip install gunicorn
@@ -136,11 +139,13 @@ One for production:
 $ heroku create wordcount-pro
 ```
 
-And one for staging (or pre-production):
+And one for staging:
 
 ```
 $ heroku create wordcount-stage
 ```
+
+> You'll need to name these something different. Just make sure to include some identifier for production and staging, so you can tell the difference. 
 
 Add your new apps to your git remotes. Make sure to name one pro (for "production") and the other stage (for "staging"):
 
@@ -151,18 +156,12 @@ $ git remote add stage git@heroku.com:YOUR_APP_NAME.git
 
 Now we can push both of our apps live to Heroku.
 
-For staging:
-```
-$ git push stage master
-```
+- For staging: `git push stage master`
+- For production: `git push pro master`
 
-For production:
+Once both of those have been pushed, open them up in your web browser and see that your app is working on both URLs. 
 
-```
-$ git push pro master
-```
-
-Once both of those have been pushed, navigate to them and see that your app is working on both URLs. 
+## Staging/Production Workflow
 
 Let's make a change to our app and push only to staging:
 
@@ -182,34 +181,25 @@ if __name__ == '__main__':
     app.run()
 ```
 
-Run your app locally to make sure everything is working
-```
-$ python app.py
-```
+Run your app locally to make sure everything is working - `python app.py`
 
 Test it out by adding a name after the URL. For example: [http://localhost:5000/mike](http://localhost:5000/mike).
 
-Now we want to try out our changes on staging before we push them live to production. Make sure your changes are committed in git and push your work up to staging:
+Now we want to try out our changes on staging before we push them live to production. Make sure your changes are committed in git and then push your work up to staging - `git push stage master`.
 
-```
-$ git push stage master
-```
+Now if you navigate to your staging environment, you'll be able to use the new URL - i.e., "/mike" and get "Hello NAME" based on what you put into the URL as the output in the browser. However, if you try the same thing on the production site you will get an error. *So we can build things and test them out on staging and then when we're happy, push them live to production.* 
 
-Now if you navigate to your staging environment, you'll be able to use the new `/<name>` url and get "Hello <name>" based on what you put into the URL as the output. However, if you try the same thing on the production site you will get an error. *So we can build things and test them out on staging and then when we're happy, push them live to production.* 
-
-Let's push our site to production now that we're happy with it:
-
-```
-$ git push pro master
-```
+Let's push our site to production now that we're happy with it - `git push pro master`
 
 Now we have the same functionality live on our production site. 
 
-*This staging/production workflow allows us to make changes, show things to clients, within a sandboxed serve without causing any changes to the live production site that users are using.*
+**This staging/production workflow allows us to make changes, show things to clients, within a sandboxed server without causing any changes to the live production site that users are using.**
 
 ## Config Settings
 
-The last thing that we're going to do is set up different config environments for our app. Often there are things that are going to be different between your local, staging, and production setups. You’ll want to connect to different databases, have different AWS keys, etc. Let’s set up a config file to deal with the different servers. Add a config.py file to your project
+The last thing that we're going to do is set up different config environments for our app. Often there are things that are going to be different between your local, staging, and production setups. You’ll want to connect to different databases, have different AWS keys, etc. Let’s set up a config file to deal with the different servers. 
+
+Add a *config.py* file to your project:
 
 ```
 $ touch config.py
@@ -241,9 +231,7 @@ class TestingConfig(Config):
     TESTING = True
 ```
 
-We set up a base Config class with some basic setup that our other config classes inherit from. Now we will be able to import the appropriate config class based on the situation that we're in.
-
-So, now we can use environment variables to choose which settings we’re going to use based on the environment (e.g., local, staging, production). 
+We set up a base Config class with some basic setup that our other config classes inherit from. Now we will be able to import the appropriate config class based on the current environment. Thus, we can use environment variables to choose which settings we’re going to use based on the environment (e.g., local, staging, production). 
 
 ### Local Settings
 
@@ -304,7 +292,7 @@ We imported `os` and we used the `os.environ` method to import the appropriate `
 
 Commit and push your changes to both staging and production (and Github if you have it setup). 
 
-Want to test the environment variables out to make sure it's detecting the right environment? Add a print statement to *app.py*: 
+Want to test the environment variables out to make sure it's detecting the right environment (sanity check!)? Add a print statement to *app.py*: 
 
 ```python
 print os.environ['APP_SETTINGS']
@@ -338,6 +326,6 @@ config.StagingConfig
 
 <hr>
 
-With the setup out of the way, we're going to start to build out the word counting functionality of this app in the next part. Along the way, we'll add a request queue to set up background processing for the word count portion, as well dig further into our Heroku setup by adding setting up the configuration and migrations for our database which we'll use to store our wordcount results.
+With the setup out of the way, we're going to start to build out the word counting functionality of this app in the next part. Along the way, we'll add a request queue to set up background processing for the word count portion, as well dig further into our Heroku setup by setting up the configuration and migrations for our database which we'll use to store our wordcount results.
 
 Best!
