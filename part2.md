@@ -21,4 +21,55 @@ Add the following line to the DevelopmentConfig class in your config.py file to 
 ```
 SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/wordcount_dev'
 ```
-Now let's set up a basic model to hold the results of 
+Now in your app.py file we're going to import SQLAlchemy and connect our database
+```python
+from flask import Flask
+from flask.ext.sqlalchemy import SQLAlchemy
+import os
+
+app = Flask(__name__)
+app.config.from_object(os.environ['APP_SETTINGS'])
+
+db = SQLAlchemy(app)
+
+@app.route('/')
+def hello():
+    return "Hello World!"
+
+@app.route('/<name>')
+def hello_name(name):
+    return "Hello {}!".format(name)
+
+if __name__ == '__main__':
+    app.run()
+```
+
+Now let's set up a basic model to hold the results of our wordcount. Add a new models.py file to your app
+```
+$ touch models.py
+```
+Within that file create a Result model
+```python
+from app import db
+
+class Result(db.model):
+    __tablename__ = 'results'
+
+    id = db.Column(db.Integer, primary_key=True)
+    url = db.Column(db.String())
+    result_all = db.Column(db.JSON)
+    result_no_stop_words = db.Column(db.JSON)
+
+    def __init__(self, url, result_all, result_no_stop_words):
+        self.url = url
+        self.result_all = result_all
+        self.result_no_stop_words = result_no_stop_words
+
+    def __repr__(self):
+        return '<id %r>' % self.id
+```
+Migrations
+Config for heroku databases
+Deploy to heroku
+Run heroku migrations
+
