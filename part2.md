@@ -68,7 +68,10 @@ class Result(db.model):
     def __repr__(self):
         return '<id %r>' % self.id
 ```
-Migrations
+What we are doing here is creating a table to store the results of our wordcount. We first import the database that we created in our app.py file. Next we create a Result class and assign it a table name of results. We then set the attributes that we want to store for a result - the id of the result we stored, the url that we counted the words of, a full list of words that we counted, and a list of words that we counted that doesn't include stop words (More on this later). We then create an __init__ method that will run the first time that we create a new result, and finally a __repr__ method to represent the object when we query for it.
+
+We are going to use Alembic and Flask-Migrate to migrate our database to the latest version. We could 
+
 Config for heroku databases
 Deploy to heroku
 Run heroku migrations
