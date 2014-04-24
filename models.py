@@ -1,12 +1,13 @@
 from app import db
+from sqlalchemy.dialects.postgresql import JSON
 
-class Result(db.model):
+class Result(db.Model):
     __tablename__ = 'results'
 
     id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String())
-    result_all = db.Column(db.JSON)
-    result_no_stop_words = db.Column(db.JSON)
+    result_all = db.Column(JSON)
+    result_no_stop_words = db.Column(JSON)
 
     def __init__(self, url, result_all, result_no_stop_words):
         self.url = url

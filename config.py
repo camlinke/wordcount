@@ -13,6 +13,7 @@ class StagingConfig(Config):
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
+    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/wordcount_dev'
 
 class TestingConfig(Config):
     TESTING = True
