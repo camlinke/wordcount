@@ -126,6 +126,31 @@ $ python manage.py db upgrade
   INFO  [alembic.migration] Running upgrade None -> 20ff8063fe45, empty message
 ```
 Our database is now ready for us to use in our app. Finally we are going to apply these migrations to our Heroku databases.
+<br>
+First we need to add the details or our staging and production databases to our config file. To check if you have a database set up on your staging server run.
+```
+$ heroku config --app stage-wordcount3000
+  === stage-wordcount3000 Config Vars
+  APP_SETTINGS:               config.StagingConfig
+  DATABASE_URL:               postgres://info:about/my/database
+  HEROKU_POSTGRESQL_NAVY_URL: postgres://info:about/my/database
+```
+
+```
+$ heroku addons:add heroku-postgresql:dev --app stage-wordcount3000
+  Adding heroku-postgresql:dev on stage-wordcount3000... done, v11 (free)
+  Attached as HEROKU_POSTGRESQL_NAVY_URL
+  Database has been created and is available
+  ! This database is empty. If upgrading, you can transfer
+  ! data from another database with pgbackups:restore.
+  Use `heroku addons:docs heroku-postgresql` to view documentation.
+```
+
+Next commit the changes that you've made to git. Next push your staging server
+```
+$ git push stage master
+```
+Now that you
 
 Shows up in the migrations file
 Create our first migration
