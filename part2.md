@@ -19,7 +19,20 @@ Psycopg is is a python adapter for Postgres, SQLAlchemy is an awesome python ORM
 <br>
 Add the following line to the DevelopmentConfig class in your config.py file to set your app to use your newly created database in development.
 ```
-SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/wordcount_dev'
+SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+```
+Similar to how we added an environment variable in the last post we are going to add a DATABASE_URL variable to our postactivate file. Using VIM you can do this in the following way: <br>
+Open your file in VIM
+```
+$ vi $VIRTUAL_ENV/bin/postactivate
+```
+Hit 'i' on your keyboard to insert text. Add the following line to your file:
+```
+export DATABASE_URL="postgresql://localhost/wordcount_dev"
+```
+Now hit escape and type 'wq' and then enter to save and close vim. Restart your environment:
+```
+$ workon wordcount
 ```
 Now in your app.py file we're going to import SQLAlchemy and connect our database
 ```python
@@ -150,7 +163,7 @@ $ heroku addons:add heroku-postgresql:dev --app stage-wordcount3000
   ! data from another database with pgbackups:restore.
   Use `heroku addons:docs heroku-postgresql` to view documentation.
 ```
-Now when we run heroku config again we should the connection settings for our URL. Rather than hard code the database url into our app like we did with our local one, we are going to import the uri of our database in from the environment variable, similar to how we're importing our config settings. Add the following line to both the staging and production config classes that you have set up in config.py
+Now when we run heroku config again we should the connection settings for our URL. Similar to how we set up the config for our local database, we are going to import the uri of our database in from the environment variable. Add the following line to both the staging and production config classes that you have set up in config.py
 ```python 
 SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 ```
@@ -175,7 +188,7 @@ class StagingConfig(Config):
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/wordcount_dev'
+    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 
 class TestingConfig(Config):
     TESTING = True
