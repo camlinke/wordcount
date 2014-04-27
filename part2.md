@@ -83,7 +83,7 @@ class Result(db.Model):
     def __repr__(self):
         return '<id %r>' % self.id
 ```
-What we are doing here is creating a table to store the results of our wordcount. We first import the database that we created in our app.py file as well as JSON from sqlalchemy's postgresql dialects. Next we create a Result class and assign it a table name of results. We then set the attributes that we want to store for a result - the id of the result we stored, the url that we counted the words of, a full list of words that we counted, and a list of words that we counted that doesn't include stop words (More on this later). We then create an __init__ method that will run the first time that we create a new result, and finally a __repr__ method to represent the object when we query for it.
+What we are doing here is creating a table to store the results of our wordcount. We first import the database connection that we created in our app.py file as well as JSON from sqlalchemy's postgresql dialects. JSON columns are fairly new to Postgres and are not available in every database supported by SQLAlchemy so we need to import it specifically. Next we create a Result class and assign it a table name of results. We then set the attributes that we want to store for a result - the id of the result we stored, the url that we counted the words of, a full list of words that we counted, and a list of words that we counted that doesn't include stop words (More on this later). We then create an __init__ method that will run the first time that we create a new result, and finally a __repr__ method to represent the object when we query for it.
 <br>
 We are going to use Alembic and Flask-Migrate to migrate our database to the latest version. Alembic is migration library for SQLAlchemy and could be used without Flask-Migrate if you want. However Flask-Migrate does help with some of the setup and makes things easier. You installed Alembic and Flask-Migrate earlier when you ran pip install Flask-Migrate. 
 <br>
@@ -214,6 +214,6 @@ $ heroku addons:add heroku-postgresql:dev --app wordcount3000
 $ git push pro master
 $ heroku run python manage.py db upgrade --app wordcount3000
 ```
-Now both our our stage and production sites have their databases set up and are migrated and ready to go. In Part 3 we're going to build the word counting functionality and have it sent to a request queue to deal with the long running wordcount.
+Now both our our stage and production sites have their databases set up and are migrated and ready to go. In Part 3 we're going to build the word counting functionality and have it sent to a request queue to deal with the longer running wordcount processing.
 
 Best!
