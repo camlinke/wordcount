@@ -56,7 +56,7 @@ db = SQLAlchemy(app)
 
 from models import Result
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
     return render_template('index.html')
 
@@ -66,3 +66,29 @@ if __name__ == '__main__':
 We are importing render_template from flask so that we can use our newly created template. We are then changing our index route to serve that file.
 <br>
 Now that we have our basic 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
