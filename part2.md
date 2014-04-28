@@ -1,6 +1,6 @@
 # Flask by Example, Part 2 - Postgres, SQLAlchemy, and Alembic
 
-Welcome! Today we're going to build an app using Flask with a simple text box that you enter text into and the app processes and displays a count of how many times each word appears on the page.
+Welcome! Today we're going to build an app using Flask with a simple text box. When you enter text into the box, the app processes and displays a count of how many times each word appears on the page.
 
 1. In part one, we'll set up a local development environment and then deploy both a staging environment and a production environment on Heroku.
 2. In part two, we'll set up our PostgreSQL database along with SQLAlchemy as our ORM and Alembic to handle migrations.
@@ -283,7 +283,7 @@ $ git push pro master
 $ heroku run python manage.py db upgrade --app wordcount-pro
 ```
 
-Now both our our staging and production sites have their databases set up and are migrated and ready to go.
+Now both our staging and production sites have their databases set up and are migrated and ready to go.
 
 ## Sanity Check
 
