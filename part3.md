@@ -65,10 +65,60 @@ if __name__ == '__main__':
 ```
 We are importing render_template from flask so that we can use our newly created template. We are then changing our index route to serve that file.
 <br>
-Now that we have our basic 
+Next we create a basic html template to set up our homepage:
+```html
+<html>
+    <head>
+        <title>Wordcount</title>
+    </head>
+    <style type="text/css">
+        .content {
+            width: 960px;
+            height: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 100px;
+            text-align: center;
+        }
+        #url-box {
+            width: 300px;
+            height: 30px;
+            font-size: 19px;
+        }
+        #results {
+            width: 100%;
+            height: 100%;
+        }
+        table {
+            margin: 0 auto;
+        }
+        thead {
+            text-align: left;
+        }
+        button {
+            height: 29px;
+            font-size: 19px;
+        }
+    </style>
+    <body>
+        <div class="content">
+            <h1>Wordcount3000</h1>
+            <form method='POST' action='/'>
+                <input type="text" name="url" placeholder="Enter URL..." id="url-box">
+                <button type="submit" value="Submit">Submit</button>
+            </form>
+        </div>
+    </body>
+</html>
+```
+We have a bit of styling to make the page not completely hideous. Then we create a form with a textbox for people to be able to enter their url.
 
-
-
+capture URL
+convert URL
+request queue for conversion
+AJAXY stuff
+save result
+find past results based on id
 
 
 
