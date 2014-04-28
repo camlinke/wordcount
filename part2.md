@@ -1,4 +1,10 @@
-# Flask by Example, Part 2 - Project Setup
+# Flask by Example, Part 2 - Postgres, SQLAlchemy, and Alembic
+
+Welcome! Today we're going to build an app using Flask with a simple text box that you enter text into and the app processes and displays a count of how many times each word appears on the page.
+
+In part one, we'll set up a local development environment and then deploy both a staging environment and a production environment on Heroku.
+In part two, we'll set up our PostgreSQL database along with SQLAlchemy as our ORM and Alembic to handle migrations.
+In part three, we'll be doing a bunch of backend processing to count the words of a web page so we’ll implement a request queue that will do the actual processing of the words.
 
 ## Setting up database and migrations
 
@@ -11,16 +17,17 @@ Tools we'll use in this part:
 - Alembic - [http://alembic.readthedocs.org/en/latest/](http://alembic.readthedocs.org/en/latest/)
 - Flask-Migrate - [http://flask-migrate.readthedocs.org/en/latest/](http://flask-migrate.readthedocs.org/en/latest/)
 
-To get started install Postgres on your local computer if you don't have it already. Since Heroku uses Postgres it will be good for us to develop locally on the same database. If you don't have Postgres installed, [Postgres.app](http://postgresapp.com/) is an easy way to get up and running quick for Mac users. Once you have Postgres installed, create a database called *wordcount_dev* to use as our local development database. In order to use our newly created database in our Flask app we're going to need to install a few things
+To get started install Postgres on your local computer if you don't have it already. Since Heroku uses Postgres it will be good for us to develop locally on the same database. If you don't have Postgres installed, [Postgres.app](http://postgresapp.com/) is an easy way to get up and running quick for Mac users. Once you have Postgres installed, create a database called *wordcount_dev* to use as our local development database. In order to use our newly created database in our Flask app we're going to need to install a few things:
 
 ```
+$ workon wordcount
 $ pip install psycopg2, SQLAlchemy, Flask-Migrate
 $ pip freeze > requirements.txt
 ```
 
-Psycopg is is a Python adapter for Postgres, SQLAlchemy is an awesome Python ORM, and Flask-Migrate will install both that extension and Alembic which we'll use for our database migrations. 
+Psycopg is is a Python adapter for Postgres, SQLAlchemy is an awesome Python ORM, and Flask-Migrate will install both that extension and Alembic which we'll use for our database migrations.
 
-> If you're on Mavericks and having trouble installing psycopg2 check out this link [http://stackoverflow.com/questions/22313407/clang-error-unknown-argument-mno-fused-madd-python-package-installation-fa](http://stackoverflow.com/questions/22313407/clang-error-unknown-argument-mno-fused-madd-python-package-installation-fa)
+> If you're on Mavericks and having trouble installing psycopg2 check out [this](http://stackoverflow.com/questions/22313407/clang-error-unknown-argument-mno-fused-madd-python-package-installation-fa) Stack Overflow article.
 
 Add the following line to the `DevelopmentConfig()` class in your *config.py* file to set your app to use your newly created database in development:
 
@@ -33,16 +40,16 @@ Similar to how we added an environment variable in the last post we are going to
 1. Open your file in VIM
 
   ```
-  $ vi $VIRTUAL_ENV/bin/postactivate  
+  $ vi $VIRTUAL_ENV/bin/postactivate
   ```
 
-2. Hit 'i' on your keyboard to insert text. Add the following line to your file:
+2. Press 'i' on your keyboard to insert text and add the following line to your file:
 
 ```
 export DATABASE_URL="postgresql://localhost/wordcount_dev"
 ```
 
-3. Now hit escape and type 'wq' and then enter to save and close vim. 
+3. Now hit escape and type 'wq' and then enter to save and close VIM.
 
 4. Restart your environment:
 
@@ -98,13 +105,13 @@ class Result(db.Model):
         return '<id %r>' % self.id
 ```
 
-What we are doing here is creating a table to store the results of our wordcount. We first import the database connection that we created in our *app.py* file as well as JSON from sqlalchemy's postgresql dialects. JSON columns are fairly new to Postgres and are not available in every database supported by SQLAlchemy so we need to import it specifically. 
+What we are doing here is creating a table to store the results of our wordcount. We first import the database connection that we created in our *app.py* file as well as JSON from sqlalchemy's postgresql dialects. JSON columns are fairly new to Postgres and are not available in every database supported by SQLAlchemy so we need to import it specifically.
 
-Next we create a `Result()` class and assign it a table name of `results`. We then set the attributes that we want to store for a result - the id of the result we stored, the url that we counted the words of, a full list of words that we counted, and a list of words that we counted minus stop words (more on this later). 
+Next we create a `Result()` class and assign it a table name of `results`. We then set the attributes that we want to store for a result - the id of the result we stored, the url that we counted the words of, a full list of words that we counted, and a list of words that we counted minus stop words (more on this later).
 
 We then create an `__init__()` method that will run the first time we create a new result and, finally, a `__repr__()` method to represent the object when we query for it.
 
-We are going to use Alembic and Flask-Migrate to migrate our database to the latest version. Alembic is migration library for SQLAlchemy and could be used without Flask-Migrate if you want. However Flask-Migrate does help with some of the setup and makes things easier. 
+We are going to use Alembic and Flask-Migrate to migrate our database to the latest version. Alembic is migration library for SQLAlchemy and could be used without Flask-Migrate if you want. However Flask-Migrate does help with some of the setup and makes things easier.
 
 Create a new file called *manage.py*:
 
@@ -125,7 +132,7 @@ if __name__ == '__main__':
     manager.run()
 ```
 
-In order to use Flask-Migrate we need to import `Manager` as well as `Migrate` and `MigrateCommand` to our *manage.py* file. We also import `app` and `db` so we have access to them within our manage script. 
+In order to use Flask-Migrate we need to import `Manager` as well as `Migrate` and `MigrateCommand` to our *manage.py* file. We also import `app` and `db` so we have access to them within our manage script.
 
 First we set our config to get our environment based on the environment variabile and create a migrate instance with `app` and `db` as the arguments and set up a `manager` command to initialize a `Manager` instance for our app. Finally we add the `db` command to our manager so that we can run our migrations from the command line.
 
@@ -143,7 +150,7 @@ $ python manage.py db init
   Please edit configuration/connection/logging settings in '/wordcount/migrations/alembic.ini' before proceeding.
 ```
 
-After you run the database initialization you will see a new folder called "migrations" in the project. This holds the setup necessary for Alembic to run migrations on the project. Inside of "migrations" you will see that it has a folder called "versions", containing the migration scripts as they are created. 
+After you run the database initialization you will see a new folder called "migrations" in the project. This holds the setup necessary for Alembic to run migrations on the project. Inside of "migrations" you will see that it has a folder called "versions", containing the migration scripts as they are created.
 
 Let's create our first migration by running the `migrate` command.
 
@@ -166,7 +173,7 @@ $ python manage.py db upgrade
   INFO  [alembic.migration] Running upgrade None -> 20ff8063fe45, empty message
 ```
 
-Our database is now ready for us to use in our app. 
+Our database is now ready for us to use in our app.
 
 Finally we are going to apply these migrations to our Heroku databases.
 
@@ -199,11 +206,11 @@ $ heroku addons:add heroku-postgresql:dev --app stage-wordcount3000
   Use `heroku addons:docs heroku-postgresql` to view documentation.
 ```
 
-Now when we run heroku config again we should see the connection settings for our URL. 
+Now when we run heroku config again we should see the connection settings for our URL.
 
 Similar to how we set up the config for our local database, we are going to import the URI of our database in from the environment variable. Add the following line to both the staging and production `config()` classes that you have set up in *config.py*:
 
-```python 
+```python
 SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 ```
 
@@ -266,7 +273,7 @@ $ git push pro master
 $ heroku run python manage.py db upgrade --app wordcount3000
 ```
 
-Now both our our staging and production sites have their databases set up and are migrated and ready to go. 
+Now both our our staging and production sites have their databases set up and are migrated and ready to go.
 
 In Part 3 we're going to build the word counting functionality and have it sent to a request queue to deal with the longer running wordcount processing. See you next time.
 
