@@ -178,7 +178,7 @@ if __name__ == '__main__':
 
 In order to use Flask-Migrate we need to import `Manager` as well as `Migrate` and `MigrateCommand` to our *manage.py* file. We also import `app` and `db` so we have access to them within our manage script.
 
-First we set our config to get our environment based on the environment variabile and create a migrate instance with `app` and `db` as the arguments and set up a `manager` command to initialize a `Manager` instance for our app. Finally we add the `db` command to our manager so that we can run our migrations from the command line.
+First we set our config to get our environment based on the environment variable and create a migrate instance with `app` and `db` as the arguments and set up a `manager` command to initialize a `Manager` instance for our app. Finally we add the `db` command to our manager so that we can run our migrations from the command line.
 
 In order to run our migrations initialize Alembic:
 
@@ -287,7 +287,7 @@ Now both our staging and production sites have their databases set up and are mi
 
 ## Sanity Check
 
-Remember in Part 1, when we tested the environment variables to make sure right environment was being detected by adding a print statment to *app.py* - `print os.environ['APP_SETTINGS']`? Well, let's do the same thing, but test the Database URIs by adding a print to *config.py*:
+Remember in Part 1, when we tested the environment variables to make sure right environment was being detected by adding a print statement to *app.py* - `print os.environ['APP_SETTINGS']`? Well, let's do the same thing, but test the Database URIs by adding a print to *config.py*:
 
 ```python
 print os.environ['DATABASE_URL']
