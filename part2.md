@@ -223,7 +223,7 @@ Our database is now ready for us to use in our app.
 
 Finally we are going to apply these migrations to our Heroku databases.
 
-First, though, we need to add the details or our staging and production databases to our *config.py* file. To check if you have a database set up on your staging server run:
+First, though, we need to add the details of our staging and production databases to our *config.py* file. To check if you have a database set up on your staging server run:
 
 ```
 $ heroku config --app wordcount-stage
@@ -283,7 +283,7 @@ $ git push pro master
 $ heroku run python manage.py db upgrade --app wordcount-pro
 ```
 
-Now both our staging and production sites have their databases set up and are migrated and ready to go.
+Now both our staging and production sites have their databases set up and are migrated - and ready to go!
 
 ## Sanity Check
 
@@ -318,7 +318,7 @@ Running `python config.py` attached to terminal... up, run.3993
 postgres://rsjezmhdfavadr:_ams4r9uEHXcGCZOcnDqqD6Pxs@ec2-54-235-250-41.compute-1.amazonaws.com:5432/d6dpkb5kmd7bg9
 ```
 
-The URIs for the staging and production should match the URIs displayed when we ran the `heroku` config commands:
+The URIs for the staging and production should match the URIs displayed when we ran the `heroku` config commands. Test this out again:
 
 ```
 $ heroku config --app wordcount-stage
