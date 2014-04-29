@@ -1,16 +1,17 @@
 # Flask by Example, Part 2 - Postgres, SQLAlchemy, and Alembic
 
-Welcome! Today we're going to build an app using Flask with a simple text box that you enter text into and the app processes and displays a count of how many times each word appears on the page.
+Welcome! Today we're going to build an app using Flask with a simple text box. When you enter text into the box, the app processes and displays a count of how many times each word appears on the page.
 
-In part one, we'll set up a local development environment and then deploy both a staging environment and a production environment on Heroku.
-In part two, we'll set up our PostgreSQL database along with SQLAlchemy as our ORM and Alembic to handle migrations.
-In part three, we'll be doing a bunch of backend processing to count the words of a web page so we’ll implement a request queue that will do the actual processing of the words.
+1. In part one, we'll set up a local development environment and then deploy both a staging environment and a production environment on Heroku.
+2. In part two, we'll set up our PostgreSQL database along with SQLAlchemy as our ORM and Alembic to handle migrations.
+3. In part three, we'll be doing a bunch of backend processing to count the words of a web page so we’ll implement a request queue that will do the actual processing of the words.
 
 ## Install Requirements
 
 In this section we're going to get our database set up to store the results of our word counts. Along the way we'll set up a Postgres database, set up SQLAlchemy to use as an ORM, and use Alembic for our data migrations.
 
 Tools we'll use in this part:
+
 - Postgres - [http://www.postgresql.org/](http://www.postgresql.org/)
 - Psycopg - [http://initd.org/psycopg/](http://initd.org/psycopg/)
 - SQLAlchemy - [http://www.sqlalchemy.org/](http://www.sqlalchemy.org/)
@@ -84,9 +85,9 @@ Similar to how we added an environment variable in the last post we are going to
 
 2. Press 'i' on your keyboard to insert text and add the following line to your file:
 
-```
-export DATABASE_URL="postgresql://localhost/wordcount_dev"
-```
+  ```
+  export DATABASE_URL="postgresql://localhost/wordcount_dev"
+  ```
 
 3. Now hit escape, type ':' then 'wq', and press enter to save and close VIM.
 
@@ -177,7 +178,7 @@ if __name__ == '__main__':
 
 In order to use Flask-Migrate we need to import `Manager` as well as `Migrate` and `MigrateCommand` to our *manage.py* file. We also import `app` and `db` so we have access to them within our manage script.
 
-First we set our config to get our environment based on the environment variabile and create a migrate instance with `app` and `db` as the arguments and set up a `manager` command to initialize a `Manager` instance for our app. Finally we add the `db` command to our manager so that we can run our migrations from the command line.
+First we set our config to get our environment based on the environment variable and create a migrate instance with `app` and `db` as the arguments and set up a `manager` command to initialize a `Manager` instance for our app. Finally we add the `db` command to our manager so that we can run our migrations from the command line.
 
 In order to run our migrations initialize Alembic:
 
@@ -222,7 +223,7 @@ Our database is now ready for us to use in our app.
 
 Finally we are going to apply these migrations to our Heroku databases.
 
-First, though, we need to add the details or our staging and production databases to our *config.py* file. To check if you have a database set up on your staging server run:
+First, though, we need to add the details of our staging and production databases to our *config.py* file. To check if you have a database set up on your staging server run:
 
 ```
 $ heroku config --app wordcount-stage
@@ -282,11 +283,11 @@ $ git push pro master
 $ heroku run python manage.py db upgrade --app wordcount-pro
 ```
 
-Now both our our staging and production sites have their databases set up and are migrated and ready to go.
+Now both our staging and production sites have their databases set up and are migrated - and ready to go!
 
 ## Sanity Check
 
-Remember in Part 1, when we tested the environment variablesto make sure right environment was being detected by adding a print statment to *app.py* - `print os.environ['APP_SETTINGS']`. Well, let's do the same thing, but test the Postgres URI by adding a print to *config.py*:
+Remember in Part 1, when we tested the environment variables to make sure right environment was being detected by adding a print statement to *app.py* - `print os.environ['APP_SETTINGS']`? Well, let's do the same thing, but test the Database URIs by adding a print to *config.py*:
 
 ```python
 print os.environ['DATABASE_URL']
@@ -317,7 +318,7 @@ Running `python config.py` attached to terminal... up, run.3993
 postgres://rsjezmhdfavadr:_ams4r9uEHXcGCZOcnDqqD6Pxs@ec2-54-235-250-41.compute-1.amazonaws.com:5432/d6dpkb5kmd7bg9
 ```
 
-The URIs for the staging and production should match the URIs displayed when we ran the `heroku` config commands:
+The URIs for the staging and production should match the URIs displayed when we ran the `heroku` config commands. Test this out again:
 
 ```
 $ heroku config --app wordcount-stage
@@ -330,6 +331,8 @@ $ heroku config --app wordcount-pro
 ```
 
 ## Conclusion
+
+That's it for part 2. I hope database migrations make better sense now. Please comment below with questions.
 
 In Part 3 we're going to build the word counting functionality and have it sent to a request queue to deal with the longer running wordcount processing. See you next time.
 
