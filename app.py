@@ -48,8 +48,24 @@ def index():
             db.session.add(result)
             db.session.commit()
         except:
-            print "didn't work"
+            errors.append("Unable to add item to database")
     return render_template('index.html', errors=errors, results=results)
 
 if __name__ == '__main__':
     app.run()
+
+@app.route('/foo', methods=['GET', 'POST'])
+def index2():
+    errors = []
+    results = {}
+    if request.method == "POST":
+        #get url that the person has entered
+        try:
+            url = request.form['url']
+            if 'http://' not in url[:7]:
+                url = 'http://' + url
+            r = requests.get(url)
+            print r.text
+        except:
+            errors.append("Unable to get URL, please make sure it's valid and try again")
+    return render_template('index.html', errors=errors, results=results)

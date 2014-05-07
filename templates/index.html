@@ -30,11 +30,17 @@
             height: 29px;
             font-size: 19px;
         }
+        h3 {
+            color: red;
+        }
     </style>
     <body>
         <div class="content">
             <h1>Wordcount3000</h1>
-            <form method='POST' action='/'>
+            {% for error in errors %}
+                <h3>{{ error }}</h3>    
+            {% endfor %}
+            <form method='POST' action='/foo'>
                 <input type="text" name="url" placeholder="Enter URL..." id="url-box">
                 <button type="submit" value="Submit">Submit</button>
             </form>
