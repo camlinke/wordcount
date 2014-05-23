@@ -157,7 +157,7 @@ def index():
             errors.append("Unable to get URL, please make sure it's valid and try again")
     return render_template('index.html', errors=errors, results=results)
 ```
-The first thing we do here is import the requests library and from flask we import request. Next we add a couple of variable to capture our errors so we can display them to the user, and set up our results as an empty dictionary initially. Next we add an if statement to check if the method of the request is a POST (note: don't confuse request, which comes from flask, and requests, which is the library we imported). If the user is posting the form we get the value of the textfield, which we have named 'url', from the form and assign it to a url variable. We do a little clean up on the entry to see if they have included 'http://' and add it if they haven't. Next we use requests to go and get the url for us, and print out the text of what is returned to the console to make sure everything is working. Finally we except any errors that are thrown and give a generic error to the user if it doesn't work. Like before we render our index.html template, however this time we include any errors and results that we have.
+The first thing we do here is import the requests library and from flask we import request. Next we add a couple of variable to capture our errors so we can display them to the user, and set up our results as an empty dictionary initially. Next we add an if statement to check if the method of the request is a POST (note: don't confuse request, which we imported from flask, and requests, which is the library we imported). If the user is posting the form we get the value of the textfield, which we have named 'url', from the form and assign it to a url variable. We do a little clean up on the entry to see if they have included 'http://' and add it if they haven't. Next we use requests to go and get the url for us, and print out the text of what is returned to the console to make sure everything is working. Finally we except any errors that are thrown and give a generic error to the user if it doesn't work. Like before we render our index.html template, however this time we include any errors and results that we have.
 <br>
 Run your server:
 ```
@@ -165,7 +165,7 @@ $ python manage.py runserver
 ```
 You should be able now to type in a web page and in the console you'll see the text of that webpage returned.
 <br>
-Now we want to count the frequency of the words that are on the page and display them to the user. Update your code to the following:
+Now we want to count the frequency of the words that are on the page and display them to the user. Update your code to the following and we'll walk through what we are doing:
 ```python
 from flask import Flask, render_template, request
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -223,7 +223,92 @@ def index():
 if __name__ == '__main__':
     app.run()
 ```
-
+First we import Counter and OrderedDict from collections, and we import operator. These are going to come in handy when we are counting words and displaying the results. Next we import re as we're going to use a regular expression, and nltk which is a very powerful library for dealing with text and language in python. NLTK is going to be very helpful for us parsing out words from the URLs that we fetch.
+<br>
+In our index route we first use nltk to clean the text that we get back from our url. Next we use nltk to tokenize (break up the text into words) the raw text. After that we turn the tokens into an nltk text object.
+<br>
+Since we don't want to have punctuation counted we create a regular expression that matches anything that's not in the alphabet. We save that regex in a variable called nonPunct and use that to run a list comprehension on the text that we have to create a list of words without punctuation or numbers. Finally we use a Counter to count the number times each word appears in that list. You'll remember that we imported Counter earlier - it's a really useful tool to tally the number of times something appears in an array.
+<br>
+This is great, however our output is going to contain a lot of words that we likely don't want to count (i, me, the...), these are called stop words. We create an array called stops with these words in them and the use a list comprehension to create an array of words that doesn't include those stop words. Next we use the Counter tool again to get a dictionary with the words and their associated count. And finally we use the sorted tool that we imported earlier to get a sorted representation of our dictionary. We use this to display the words with the highest count at the top of the list which means that we won't have to do that sorting in our jinja template.
+<br>
+Finally we use a try/except to save the results of our search and count.
+<br>
+Update your index.html file to
+```html
+<html>
+    <head>
+        <title>Wordcount</title>
+    </head>
+    <style type="text/css">
+        .content {
+            width: 960px;
+            height: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 100px;
+            text-align: center;
+        }
+        #url-box {
+            width: 300px;
+            height: 30px;
+            font-size: 19px;
+        }
+        #results {
+            width: 100%;
+            height: 100%;
+        }
+        table {
+            margin: 0 auto;
+        }
+        thead {
+            text-align: left;
+        }
+        button {
+            height: 29px;
+            font-size: 19px;
+        }
+        h3 {
+            color: red;
+        }
+    </style>
+    <body>
+        <div class="content">
+            <h1>Wordcount3000</h1>
+            {% for error in errors %}
+                <h3>{{ error }}</h3>    
+            {% endfor %}
+            <form method='POST' action='/'>
+                <input type="text" name="url" placeholder="Enter URL..." id="url-box">
+                <button type="submit" value="Submit">Submit</button>
+            </form>
+            {% if results %}
+                <div id="results">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Word</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        {% for result in results%}
+                            <tr>
+                                <td>{{ result[0] }}</td>
+                                <td>{{ result[1] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </body>
+</html>
+```
+We added an if statment to see if our results dictionary has anything in it and then added a for loop to loop over the results and display them in a table.
+<br>
+Now run your app and should be able to enter a URL and get back the count of the words on the page.
+```
+$ python manage.py runserver
+```
 
 capture URL
 convert URL
