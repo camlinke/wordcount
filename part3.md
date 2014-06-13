@@ -309,10 +309,210 @@ Now run your app and should be able to enter a URL and get back the count of the
 ```
 $ python manage.py runserver
 ```
+Okay great, we can now get a URL and count the words that are on the page. If you use a site without a massive amount of words, for instance realpython.com, this should all happen quite quickly. However try out gutenberg.ca and you'll notice that this takes longer to process. If you have a number of people all hitting your site to get word counts at the same time, and some of them are trying to count larger pages, this can end up being a problem. We don't want to count the words in the request, we want to use a queue to process this in the backend while still being able to deal with the request. There are a number of tools to do this, such as rabbitMQ, we are going to use Python RQ (http://python-rq.org/). It's a really simple library for creating a request queue built on top of Redis and is really easy to set up and implement.
+<br>
+<br>
+Start by downloading and installing redis from http://redis.io/.
+<br>
+Next start your redis server by running
+```
+$ redis-server
+```
+Next install the python redis library, as well as the rq library and rq-dashboard, and add them to your requirments.txt file
+```
+$ pip install redis, rq, rq-dashboard
+$ pip freeze > requirements.txt
+```
+Next update your app.py file to the following
+```python
+from flask import Flask, render_template, request
+from flask.ext.sqlalchemy import SQLAlchemy
+from collections import Counter, OrderedDict
+from rq_dashboard import RQDashboard
+from rq import Connection, Queue
+from redis import Redis
+import os
+import requests
+import re
+import nltk
+import operator
 
-capture URL
-convert URL
-request queue for conversion
+
+app = Flask(__name__)
+app.config.from_object(os.environ['APP_SETTINGS'])
+db = SQLAlchemy(app)
+
+redis_conn = Redis()
+q = Queue(connection=redis_conn)
+RQDashboard(app)
+
+from models import Result
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    errors = []
+    results = {}
+    if request.method == "POST":
+        #get url that the person has entered
+        try:
+            url = request.form['url']
+            if 'http://' not in url[:7]:
+                url = 'http://' + url
+            r = requests.get(url)
+        except:
+            errors.append("Unable to get URL, please make sure it's valid and try again")
+            return render_template('index.html', errors=errors)
+        raw = nltk.clean_html(r.text)
+        tokens = nltk.word_tokenize(raw)
+        text = nltk.Text(tokens)
+        nonPunct = re.compile('.*[A-Za-z].*')
+        raw_words = [w for w in text if nonPunct.match(w)]
+        raw_word_count = Counter(raw_words)
+        stops = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 
+                'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 
+                'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 
+                'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 
+                'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 
+                'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 
+                'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 
+                'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 
+                'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 
+                'through', 'during', 'before', 'after', 'above', 'below', 'to', 
+                'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 
+                'again', 'further', 'then', 'once', 'here', 'there', 'when', 
+                'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 
+                'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 
+                'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 
+                'can', 'will', 'just', 'don', 'should', 'now']
+        no_stop_words = [w for w in raw_words if w.lower() not in stops]
+        no_stop_words_count = Counter(no_stop_words)
+        results = sorted(no_stop_words_count.items(), 
+                                        key=operator.itemgetter(1),
+                                        reverse=True)
+        try:
+            result = Result(
+                    url=url,
+                    result_all = raw_word_count,
+                    result_no_stop_words = no_stop_words_count
+                )
+            db.session.add(result)
+            db.session.commit()
+        except:
+            errors.append("Unable to add item to database")
+    return render_template('index.html', errors=errors, results=results)
+
+if __name__ == '__main__':
+    app.run()
+```
+We imported the following libraries
+```python
+from rq_dashboard import RQDashboard
+from rq import Connection, Queue
+from redis import Redis
+```
+and added the following code
+```python
+q = Queue(connection=Redis())
+RQDashboard(app)
+```
+This sets up a redis connection and initializes a queue based on that connection. We also setup RQDashboard which will allow us to see the items in the queue.
+<br>
+<br>
+Next we need to get our request queue up and running. Open a new terminal and start your redis server with the following command:
+```
+$ rqworker
+```
+This gets a working up and running to accept submitted requests. Next we are going to change our app.py file to the following:
+```python
+from flask import Flask, render_template, request
+from flask.ext.sqlalchemy import SQLAlchemy
+from collections import Counter, OrderedDict
+from rq_dashboard import RQDashboard
+from rq import Connection, Queue
+from redis import Redis
+import os
+import requests
+import re
+import nltk
+import operator
+
+
+app = Flask(__name__)
+app.config.from_object(os.environ['APP_SETTINGS'])
+db = SQLAlchemy(app)
+
+q = Queue(connection=Redis())
+RQDashboard(app)
+
+from models import Result
+
+def count_and_save_words(url):
+    try:
+        r = requests.get(url)
+    except:
+        return {"error" : ["Unable to get URL, please make sure it's valid and try again"]}
+    raw = nltk.clean_html(r.text)
+    tokens = nltk.word_tokenize(raw)
+    text = nltk.Text(tokens)
+    nonPunct = re.compile('.*[A-Za-z].*')
+    raw_words = [w for w in text if nonPunct.match(w)]
+    raw_word_count = Counter(raw_words)
+    stops = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 
+            'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 
+            'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 
+            'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 
+            'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 
+            'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 
+            'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 
+            'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 
+            'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 
+            'through', 'during', 'before', 'after', 'above', 'below', 'to', 
+            'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 
+            'again', 'further', 'then', 'once', 'here', 'there', 'when', 
+            'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 
+            'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 
+            'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 
+            'can', 'will', 'just', 'don', 'should', 'now']
+    no_stop_words = [w for w in raw_words if w.lower() not in stops]
+    no_stop_words_count = Counter(no_stop_words)
+    results = sorted(no_stop_words_count.items(), 
+                                    key=operator.itemgetter(1),
+                                    reverse=True)
+    try:
+        result = Result(
+                url=url,
+                result_all = raw_word_count,
+                result_no_stop_words = no_stop_words_count
+            )
+        db.session.add(result)
+        db.session.commit()
+        return result.id
+    except:
+        return {"error" : ["Unable to add to database. Please try again later."]}
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    errors = []
+    results = {}
+    if request.method == "POST":
+        url = request.form['url']
+        if 'http://' not in url[:7]:
+            url = 'http://' + url
+        job = q.enqueue_call(func=count_and_save_words, args=(url,), result_ttl=5000)
+        print dir(q)
+        print job.get_id
+    return render_template('index.html', errors=errors, results=results)
+```
+What we do here is move the functionality out of our index route and into a new function called count_and_save_words. This function accepts one argument which is a url which we will pass to it when we call it from our index route.
+<br>
+<br>
+Now in our index route we add a new line
+```python
+job = q.enqueue_call(func=count_and_save_words, args=(url,), result_ttl=5000)
+```
+Here we use the queue that we initialized earlier and call the enqueue_call function. This adds a new job to our queue and that job runs the count_and_save_words function with url as the argument. The result_ttl=5000 line argument tells python-rq how long to hold on to the result of the job for.
+
+
 AJAXY stuff
 save result
 find past results based on id
